@@ -1,0 +1,58 @@
+保持一个干净的docker 环境
+docker rmi -f $(docker images -aq) 删除所有的docker 镜像
+
+ifconfig/ip addr 查看本机ip地址
+lo: 本机回环地址
+ens33:内网地址
+docker0:docker地址
+
+下载tomcat镜像 启动后 进入镜像
+执行ip add 
+lo:回路地址
+eth0@if7:docker分配的地址
+回到docker宿主机 ping tomcat容器是可以ping通的
+
+原理：
+只要电脑安装了docker 就会有一个docker0网卡 桥接模式。使用的技术是evth-pair
+evth-pair:
+是成对出现的 虚拟设备接口。彼此连接
+结论：所有容器在不指定网络的情况下都是通过docker0路由 即：内网传递 效率高
+会给容器分配一个默认可用ip
+在每个启动的docker容器中docker都会分配一个ip,在宿主机上也会多一个网卡
+
+通过容器名称获取网络地址，实现访问
+--link技术  [老技术]
+新启动容器时，使用--link 已启动容器名称 例如：
+docker run -d -P --name tomcat2 --link tomcat1 tomcat
+新启动tomcat2容器 可以直接通过服务名称‘tomcat1’已经启动的tomcat1直接通信
+启动后可以直接通过ping 服务名称验证
+需要注意，tomcat2可以ping通tomcat1但反向不行
+是因为linx中 tomcat3的/etc/host文件中 配置了tomcat2的映射地址 反之tomcat2没有配置
+docker exec -it tomcat2 ping tomcat1
+
+自定义网络：
+docker network ls 查看所有的docker网络
+bridget: 桥接 docker默认
+none:不配置网络
+host:和宿主机共享网络
+container:容器网络连通
+
+当启动一个容器
+docker run -d -P --neame tomcat1 --net bridge tomcat
+启动 --net bridge默认是加上了的。
+如：原命令
+docker run -d -P --neame tomcat1 tomcat
+
+由于docker0默认域名是不能访问的所有通过docker0桥接的容器网络不可通过容器名称互通，可以自定义一个网络
+docker network create [opt]创建一个网络
+
+docker network create --driver bridge --subnet 192.168.4.0/16 --gateway 192.168.4.1 mynet
+查看自己创建的网络
+docker network ls
+查看自己配置的网络的详细信息
+docker network inspect pyyhnet
+
+docker network inspect mynet
+让启动的容器使用自己创建的网络
+docker run -d -P --name tomcat1 --net mynet tomcat 使用了自己创建的mynet网络
+好处：不同的集群保证不同的网络，

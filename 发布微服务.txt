@@ -1,0 +1,21 @@
+步骤
+1：构建springboot项目
+2：打包应用
+3：编写dockerfile
+4:构建镜像
+5：发布运行
+
+dockerfile:
+
+FROM java:8
+
+COPY *.jar /app.jar
+
+CMD ["--server.port =8080"]
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+
+如果镜像太多：

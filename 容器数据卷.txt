@@ -1,0 +1,50 @@
+概念：
+将应用打包为镜像。
+镜像删除 数据也就删除，解决此问题 数据卷技术可以
+例如：
+mysql:容器中的mysql数据可以存储到本地，即 docker产生的数据可以同步到本地。
+总之一句话：容器的持久化，容器建数据共享
+
+使用数据卷：
+方式一：
+docker run -it -v 本地目录:容器内部目录 镜像名称 /bin/bash
+-v 目录映射
+
+查看数据卷是否挂载成功命令：
+docker inspect 镜像id
+
+数据卷优点：
+可以在本地目录操作相关数据， 不需要再进入容器
+
+实战：
+部署mysql
+
+docker run -d -p 3310:3306 -v /home/mysql/conf:/etc/mysql/conf.d 
+-v /home/mysql/data:/usr/lib/mysql
+-e MYSQL_ROOT_PASSWORD=123321 --name mysql01 mysql:5.7
+
+-d后台运行
+-p端口运行
+-e环境陪
+-v文件系统映射
+mysql镜像启动后需要映射的相关目录：
+	/etc/mysql/为配置文件目录
+	/var/lib/mysql 为数据目录
+
+实际命令：
+docker run -d -p 3310:3306 -v /home/mysql/conf:/etc/mysql -v /home/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123321 --name mysql01 mysql:5.7
+
+具名挂载，匿名挂载
+例如：docker run -d -P --name nginx02 -v 要挂载的名称：容器内地址 镜像名称
+如：docker run -d -P --name nginx02 -v nginxApp:/etc/nginx nginx
+具名挂载位置一般都在：/var/lib/docker/volumes/ 目录下
+例如上面挂载到/var/lib/docker/volumes/nginxApp/_data目录下
+
+如何区分匿名和具名挂载 还是路径挂载
+-v 容器内路径  匿名挂载
+-v 卷名:容器内路径   具名挂载
+-v 宿主机路径:容器内路径 路径挂载
+通过-v 容器内路径 ro, rw改变读写权限
+如：docker run -d -P --name nginx02 -v nginxApp:/etc/nginx:ro nginx 只读
+docker run -d -P --name nginx02 -v nginxApp:/etc/nginx:rw nginx	可读可写
+只要看到ro 说明只能通过宿主机操作。不能再容器内部修改。

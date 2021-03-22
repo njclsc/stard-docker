@@ -1,0 +1,51 @@
+1：准备tomcat,jdk压缩包
+2：编写dockerfile文件
+同目录下创建dockerfile文件，官方默认此文件名称为dockerfile，在生成镜像build时会自动寻找此文件
+就不需要-f指定dockerfile文件了，一旦命名为其他名称 必须要加-f来指定此文件
+
+FROM centos
+MAINTAINER pyyh<77166776@qq.com>
+
+COPY readme.txt /usr/local/readme.txt
+
+ADD jdk-8u231-linux-x64.tar.gz /usr/local/
+ADD apache-tomcat-7.0.63.tar.gz /usr/lcoal/
+
+RUN yum -y install vim
+
+ENV MYPATH /usr/lcoal
+WORKDIR $MYPATH
+
+ENV JAVA_HOME /usr/local/jdk-8u231-linux-x64
+ENV CLASSPATH .:$JAVA_HOME/lib
+ENV CATALINA_HOME /usr/local/apache-tomcat-7.0.63
+ENV CATALINA_BASH /usr/local/apache-tomcat-7.0.63
+ENV PATH $PATH:$JAVA_HOME/bin:$CATALINA_HOME/lib:$CATALINA_HOME/bin
+
+EXPOSE 8080
+
+CMD /usr/local/apache-tomcat-7.0.63/bin/startup.sh && tail -F /usr/local/apache-tomcat-7.0.63/bin/logs/catalina.out
+
+
+dockerfile编写完毕后 使用命令
+docker build -t 镜像名称 .  
+. 此点表示当前目录
+
+
+==============上传到阿里云===================
+1. 登录阿里云Docker Registry
+
+$ sudo docker login --username=njcl****61228 registry.cn-hangzhou.aliyuncs.com
+
+用于登录的用户名为阿里云账号全名，密码为开通服务时设置的密码。
+
+您可以在访问凭证页面修改凭证密码。
+2. 从Registry中拉取镜像
+
+$ sudo docker pull registry.cn-hangzhou.aliyuncs.com/njclsc/test:[镜像版本号]
+
+3. 将镜像推送到Registry
+
+$ sudo docker login --username=njcl****61228 registry.cn-hangzhou.aliyuncs.com
+$ sudo docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/njclsc/test:[镜像版本号]
+$ sudo docker push registry.cn-hangzhou.aliyuncs.com/njclsc/test:[镜像版本号]

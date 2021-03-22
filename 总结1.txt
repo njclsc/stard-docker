@@ -1,0 +1,2 @@
+docker save iamgeName -o savePath 导出镜像
+docker load -i fullImagePath 导入镜像

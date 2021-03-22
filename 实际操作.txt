@@ -1,0 +1,15 @@
+1：搜索镜像：
+	docker search 
+	例如: docker search nginx
+2:拉取镜像：
+	docker pull
+	例如：docker pull nginx
+3:启动镜像：
+	docker run -d --name 容器别名 -p 宿主机端口:容器端口 镜像
+	例如：docker run -d -- name nginx01 -p 7777:80
+	说明： nginx容器启动在宿主机的7777端口，并且7777端口与容器的80端口映射
+
+安装tomcat镜像遇到的问题
+
+	docker exec -it tomcat01 /bin/bash 进入到运行的镜像后：访问对应的映射端口会报
+	404错误。原因是因为 镜像里没有webapps内容，发布的镜像会最小化，最简化

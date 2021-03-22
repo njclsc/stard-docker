@@ -1,0 +1,7 @@
+connect 命令
+
+将容器连接到摸个网络
+docker network connect netName containerName
+执行此命令后 其实就是把此容器加入到了网络的配置文件中
+可以通过命令查看配置
+docker network inspect netName

@@ -1,0 +1,38 @@
+如何得到镜像
+	1：远程仓库下载
+	2:朋友复制
+	3：自己制作
+镜像/联合文件系统概念：
+	层的叠加
+	bootfs:启动文件系统
+	rootfs:用户文件系统，在bootfs系统之上
+查看进项层的详细信息：
+	docker image inspect imageName
+
+docker镜像都是只读的。
+如何提交自己的镜像
+docker commit -m="提交信息" -a="作者" 容器id  目标镜像名 [tag]
+例如：
+docker commit -a="pyyh" -m="addtomcat" 9318ac1d6000 pyyhtomcat:1.0.0
+当用户对镜像做了修改，执行以上命令 发布自己的镜像。命令说明：
+-a:作者
+-m:镜像信息
+9318ac1d6000:容器id
+pyyhtomcat:1.0.0  镜像名称和 tag
+发布自己的镜像后 以后就可以 直接使用自己的镜像
+
+将自己的镜像发布到dockerhub
+docker login -u userName -p pwd
+登录后就可发布自己的镜像
+
+docker push userName/imageName:version
+userName = dockerHub 账号
+imageName = 本地镜像名称
+举例：
+docker push njclsc/pyyhdiytomcat:1.0
+将自己的镜像发布到阿里云
+1：登录阿里云
+2：找到容器镜像服务
+3：创建名称空间
+4：创建镜像仓库
+具体操作步骤阿里云上均详细介绍可参考阿里云

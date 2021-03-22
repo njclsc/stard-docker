@@ -1,0 +1,13 @@
+1：开始-->docker会在本机寻找镜像 -->判断本机是否有这个镜像
+	如果有：就运行，
+	如果没有：就去hub下载 -->
+	如果找到镜像就下载 后 运行，没找到就报错，
+
+2：底层原理
+	docker是怎么工作的
+	docker是一个client-server结构系统，docker的守护进程运行在主机上，通过socket从客户端访问.
+	dockerserver接受到docker-client指令，就会执行这个命令
+3：docker快于vm
+	docker比vm有更少的抽象层
+	docker利用宿主机内核，vm需要时guestOS
+	

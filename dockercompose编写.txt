@@ -1,0 +1,24 @@
+层数：
+只有3层
+version: '3.8'#版本
+services:	#服务
+	服务1：web
+		images
+		build
+		network
+	服务2：redis
+		....
+	服务3：redis
+		...
+其他配置，网络，卷，其他全局配置等
+volumes:
+networks:
+configs:
+......
+
+
+
+
+----------------------------------
+docker-compose项目启动是有顺序的 
+depends_on依赖

@@ -1,0 +1,14 @@
+进去运行的镜像：
+方式一：
+	docker exec -it 容器ID /bin/bash 以交互模式进入镜像
+	
+方式二：
+	docker attach 容器ID
+
+方式一和二的区别：
+	方式一进入后 等于开启了一个新的终端
+	方式二：进入后进入正在执行程序的终端。不会新建终端
+从容器内拷贝文件到主机
+	docker cp 容器id:容器路径  目标主机路径
+	例如：
+	[root@localhost /]# docker cp e9f618beb093:/home/pyyh1.java /home

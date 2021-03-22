@@ -1,0 +1,14 @@
+后台启动命令：
+docker run -d centos #通过镜像名称启动容器
+问题：
+	docker ps 发现centos容器停止，
+	原因：使用后台启动容器必须要有一个前台进程
+	
+查看日志
+	docker logs -f -t --tail 容器，没有日志
+
+容器进程信息：
+	docker top 进程id 	#查看docker容器内部进程信息
+	
+查看镜像元数据
+	docker inspect 进程id 

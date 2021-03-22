@@ -1,0 +1,29 @@
+概述：
+dockerfile 就是用来构建docker镜像的构建文件，即：命令脚本
+
+FROM centos
+VOLUME ["volume01", "volume02"]
+CMD echo "----end----"
+CMD /bin/bash
+
+保存退出
+输入命令：
+	docker build -f /home/docker-test-volume/dockerfile01 -t pyyh/centos .
+
+dockerfile中 每一个命令就是一层
+构建步骤：
+	1：创建一个dockerfile文件
+	2：docker build 构建一个镜像
+	3：docker run运行镜像
+	4：docker push 发布镜像
+数据卷容器：
+两个容器间共享数据 即：容器与容器之间同步
+
+--volume-from
+例如：docker run -it --name 镜像1 --volume-from 镜像0
+共享数据的容器 只要还有一个容器在运行 数据就不会丢失
+实际是一个双向拷贝的概念。
+
+结论：
+	容器之间配置信息的传递，数据卷容器的生命周期一直持续到没有容器使用为止
+	但 共享数据一旦持久化到本地，因为本地数据不会删除 所以一直会被使用。

@@ -1,0 +1,40 @@
+说明： 还有镜像才能创建容器， 例子：下载一个centos镜像来学习
+docker pull centos
+
+启动镜像
+docker run [可选参数] image
+参数说明：
+	--name="name" 容器名称例如，tomcat1, tomcat2用来区分容器
+	-d 		后台方式运行
+	-it 		进入交互方式运行，进入容器查看内容
+	-p		指定容器的端口
+		-p 主机端口：容器端口（常用）
+		-p容器端口
+	-P		随机指定端口
+
+测试：
+	docker run -it centos /bin/bash  #启动并进入容器
+	exit #容器停止且退出容器
+
+列出所有运行的容器
+	docker ps	#列出当前运行的容器 
+	-a	#列出当前和以前运行过的容器
+	-n=?	#显示最近创建的容器
+	-q	#只显示容器编号
+	-aq	#显示所有容器编号
+
+退出容器：
+	exit#容器停止且退出
+	ctrl + p + q #退出容器， 但容器不停止
+删除容器：
+	docker rm 容器id	#删除指定容器，不能删除运行的容器
+	docker rm -f $(docker ps -aq)	#删除所有容器
+
+启动和停止容器的操作
+docker start 容器id
+docker restart 容器id
+docker stop 容器id
+docker kill 容器id
+
+启动docker服务：
+service docker start

@@ -1,0 +1,35 @@
+1：编写自己的项目
+
+2：编写dockerfile文件
+
+3：dockerfile内容
+
+From java:8
+
+COPY *.jar /app.jar
+
+#ENTRYPOINT 命令不会被覆盖，但CMD的目录是会被覆盖
+CMD ["--server.port=8080"]
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+4:编写docercompose.yml文件
+version: '3.8'
+	servers:
+		kuangapp:
+			build: .
+			image: kuangapp
+			depends_on:
+				- redis
+		redis: 
+			images: "library/redis:alpine"
+
+5:docker-compose up
+
+或者 docker-compose up --build 可以重新构建镜像
+
+总结：
+工程，服务，容器
+项目三层

@@ -1,0 +1,111 @@
+
+----------单体引用，不符合企业级应用要求--------------------
+1：docker概述
+2：docker安装
+3：docker命令
+	镜像命令
+	容器命令
+	操作命令
+	。。。。
+4:docker镜像
+5：容器数据卷
+6：dockerfile
+7:docker网络原理
+8：idea整合docker
+
+----------集群-----------------
+1：docker compose
+2：docker swarm
+3:ci/cd jenkins[持续集成]
+
+概述：
+	为什么会出现：
+	开发-->上线 的过程中开发环境和部署环境不一致。解决环境问题，即：带上环境打包。
+	镜像：根本
+	隔离：核心思想。将服务器资源压榨到极致
+	docker基于go语音开发
+	docker文档超级详细。
+	文档地址：https://docs.docker.com/
+	仓库地址：https://hub.docker.com/
+
+安装：
+	环境查看[系统内核]：uname -r
+	环境明细[系统版本]：cat /etc/os-release
+
+	卸载之前版本：
+	 sudo yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+	1：安装依赖包：
+		sudo yum install -y yum-utils
+	2：设置镜像仓库：
+		sudo yum-config-manager \
+    			--add-repo \
+    			https://download.docker.com/linux/centos/docker-ce.repo[国外镜像，不推荐，换为国内]
+			替换为国内：
+		sudo yum-config-manager \
+    			--add-repo \
+			http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+	3:安装工前更新yum版本
+		yum makecache fast
+	4:安装最新版docker
+		sudo yum install docker-ce docker-ce-cli containerd.io
+		如果出现问题：
+			
+			Problem 1: problem with installed package podman-1.4.2-5.module_el8.1.0+237+63e26edc.x86_64			 
+				解决：
+				#查看系统自带的podman
+				rpm -q podman
+				#卸载解决
+				yum remove podman
+			Problem: problem with installed package buildah-1.9.0-5.module_el8.1.0+237+63e26edc.x86_64
+				解决：
+				执行安装命令：yum install --allowerasing docker-ce
+	5:启动docker
+		systemctl start docker
+		启动完毕后：执行docker version 查看版本
+	6:启动helloworld程序 测试
+	docker run hello-world
+
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+b8dfde127a29: Pull complete 
+Digest: sha256:89b647c604b2a436fc3aa56ab1ec515c26b085ac0c15b0d105bc475be15738fb
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker! ####看到这句话 就证明docker安装成功
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+查看下载的镜像：
+	docker images
+
+卸载docker:
+	总结 ：卸载依赖后删除目录。
+ sudo yum remove docker-ce docker-ce-cli containerd.io
+
+ sudo rm -rf /var/lib/docker[docker的默认工作路径]
+
+ sudo rm -rf /var/lib/containerd
