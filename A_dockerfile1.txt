@@ -4,20 +4,37 @@ Base镜像(scratch) docker hub 中的99%镜像都是通过base镜像中的安装和配置需要的软件
 
 
 
-
+---------------------------
 ENV:环境变量
 WORKDIR:登录以后落脚点
 RUN: 镜像构建时执行的命令
 EXPOSE:暴露端口
+---------------------------
+CMD: 指定一个容器启动时运行的命令，
+	Dockerfile中可以有多个CMD，但只有最后一个生效，CMD会被docker run 之后的参数替换。
+	
+
+ENTRYPOINT: 和CMD一样，都是在指定容器启动程序和参
+		
+CMD,ENTRYPOINT 区别：
+	都是启动容器需要运行的命令，
+	CMD 在dockerfile 中可以有多个CMD指令，但只有最后一个生效，CMD会被docker run 之后的参数替换
+
+	ENTRYPOINT 不会被替换，只会被追加
 
 
+ONBUILD	当构建一个被继承的dockerfile时运行命令， 父镜像在被子继承后父镜像的onbuild被触发
 
-
-
-
-
-
-
+例子：
+FORM centos
+RUN yum install -y curl
+ENTRYPOINT ["curl", "-s", "http://ip.cn"]
+ONBILD RUN echo "father onbuild----> print"
+------------------------------
+COPY:
+从构建的上下文目录 复制到新的一层镜像内的目录  
+COYP /xxx/xx<源路径> /xxv/vv<镜像内路径>
+ADD:拷贝并解压
 
 
 
@@ -48,3 +65,6 @@ CMD /bin/bash
 docker build -f /home/dockerfile/Dockerfile1 -t pyyhcentos:1.0 .
 构建的目标镜像如何名称相同 在运行时 可以在名称后追加:tag
 如：docker run -it pyyhcentos:1.0
+
+如果挂载时报错
+在启动命令中添加  --privileged=true
