@@ -1,0 +1,50 @@
+dockerfile关键字
+Base镜像(scratch) docker hub 中的99%镜像都是通过base镜像中的安装和配置需要的软件构建出来的。
+
+
+
+
+
+ENV:环境变量
+WORKDIR:登录以后落脚点
+RUN: 镜像构建时执行的命令
+EXPOSE:暴露端口
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+例子：
+
+From centos
+
+MAINTAINER pyyh<77166776@qq.com>
+
+ENV MYPATH /usr/local
+
+WORKDIR $MYPATH
+
+RUN yum -y install vim
+RUN yum -y install net-tools
+
+EXPOSE 80
+
+CMD echo $MYAPTH
+CMD echo "success--->ok"
+CMD /bin/bash
+
+构建镜像
+docker build -f /home/dockerfile/Dockerfile1 -t pyyhcentos:1.0 .
+构建的目标镜像如何名称相同 在运行时 可以在名称后追加:tag
+如：docker run -it pyyhcentos:1.0
