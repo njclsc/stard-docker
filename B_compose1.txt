@@ -1,0 +1,39 @@
+安装dockercompose
+作用：对docker集群的快速编排
+定位：定义和运行多个容器的应用，同时可以对多个容器进行编排
+----------------------------
+构建文件：
+docker-compose.yml文件
+----------------------------
+核心概念
+服务（service）:一个应用容器，服务可以存在多个。
+项目（project）：由一组关联的容器组成的一个完整的业务单元，在docker-compose.yml文件中定义
+----------------------------
+compose使用
+安装
+sudo curl -L "https://github.com/docker/compose/releases/download/1.28.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+检查安装：
+docker-compose -v
+安装成功显示
+docker-compose version 1.28.6, build 5db8d86f
+
+----------------------------
+入门：
+
+1：创建一个docker-compose.yml文件
+2：在配置文件中定义一个项目有哪些服务
+---运行多个tomcat容器例子：
+version: "3.0"
+
+services:
+	tomcat: #服务名唯一
+		image：tomcat:8.0 #创建当前这个服务的镜像使用的那个镜像文件
+		ports:
+			- 8080:8080
+	tomcat1: #服务名唯一
+		image：tomcat:8.0 #创建当前这个服务的镜像使用的那个镜像文件
+		ports:
+			- 8081:8080
+
+运行docker-compose
+docker-compos up 启动这个项目的所有服务 必须保证运行命令的目录在docker-compose.yml目录下
