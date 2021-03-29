@@ -1,0 +1,321 @@
+﻿ /usr/bin/mysql 
+ /usr/lib/mysql #数据目录
+ /etc/mysql   #mysql配置目录
+
+docker run -p 13306:3306 -v /home/njcMysql/config/my.cnf:/etc/mysql/my.cnf -v /home/njcMysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123321 --name njcMysql mysql:8
+
+docker run -p 13306:3306 -v /home/njcMysql/config/my.cnf:/etc/mysql/my.cnf -v /home/njcMysql/data:/var/lib/mysql --name njcMysql mysql:8
+
+mysql镜像外网链接
+先进入容器使用 mysql -uroot登录
+1：update user set host = '%' where user = 'root';
+2：grant all PRIVILEGES on *.* to root@'%' WITH GRANT OPTION;
+3：ALTER user 'root'@'%' IDENTIFIED BY '123456' PASSWORD EXPIRE NEVER;
+4：ALTER user 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
+5：flush privileges;
+
+
+
+
+
+
+===================================================================
+启动容器
+docker run \
+ --restart=always \
+ --privileged=true \
+ -p 3306:3306 \
+ --name mysql \
+ -e MYSQL_ROOT_PASSWORD=123456a \
+ -d mysql:latest \
+ --default_authentication_plugin=mysql_native_password \
+ --character-set-server=utf8mb4 \
+ --collation-server=utf8mb4_general_ci
+————————————————
+
+创建挂载目录
+mkdir -p /opt/docker/mysql/{conf,logs,data}
+
+
+复制容器配置文件到挂载目录
+docker cp mysql: /etc/mysql/my.cnf /opt/docker/mysql/conf/
+
+销毁容器
+docker rm -f 容器ID
+
+挂载方式启动容器
+
+docker run \
+ --privileged=true \
+ --restart=always \
+ -v /opt/docker/mysql/conf/my.cnf:/etc/mysql/my.cnf \
+ -v /opt/docker/mysql/data:/var/lib/mysql \
+ -v /opt/docker/mysql/logs:/var/log/mysql \
+ --privileged=true \
+ -p 3307:3306 \
+ --name mysql \
+ -e MYSQL_ROOT_PASSWORD=123456a \
+ -d mysql:latest \
+ --default_authentication_plugin=mysql_native_password \
+ --character-set-server=utf8 \
+ --collation-server=utf8_general_ci
+
+自定义my.cnf文件
+
+[mysqld]
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+datadir         = /var/lib/mysql
+secure-file-priv= NULL
+# Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links=0
+
+# Custom config should go here
+!includedir /etc/mysql/conf.d/
+log-error=/var/log/mysql/error.log
+#log=/var/log/mysql/mysql.log
+slow_query_log =ON
+slow_query_log_file=/var/log/mysql/slowquery.log
+long_query_time=3
+log-queries-not-using-indexes=/var/log/mysql/nouseindex.log
+lower_case_table_names=1
+default_authentication_plugin=mysql_native_password
+init_connect='SET collation_connection = utf8_unicode_ci'
+init_connect='SET NAMES utf8'
+character-set-server=utf8
+collation-server=utf8_unicode_ci
+skip-character-set-client-handshake
+
+[client]
+default-character-set=utf8
+ 
+[mysql]
+default-character-set=utf8
+————————————————
+
+
+mycnf配置参数参考
+
+最完整的
+
+[mysqld]
+####: for global
+user =mysql
+federated
+basedir =/usr/local/mysql
+datadir =/data/mysql/data
+server_id = 1250
+port =3306
+mysqlx_port = 33070
+character_set_server =utf8mb4
+collation_server=utf8mb4_bin
+log_timestamps =system
+default_time_zone ='+8:00'
+socket =/data/mysql/mysql.sock
+read_only = 0
+super_read_only = 0
+skip_name_resolve =on
+lower_case_table_names =1
+#secure_file_priv =/data/mysql/data
+open_files_limit =65536
+max_connections =2000
+thread_cache_size =256
+table_open_cache =4096 # 2000
+table_definition_cache =4096
+table_open_cache_instances =64
+wait_timeout =28800
+interactive_timeout =28800
+event_scheduler = 1
+max_allowed_packet =1024M
+init_connect ='SET AUTOCOMMIT=1'
+transaction_isolation =READ-COMMITTED
+lock_wait_timeout=3600
+default_authentication_plugin=mysql_native_password
+
+###: cache
+key_buffer_size = 64M
+sort_buffer_size  = 4M
+join_buffer_size  = 4M
+
+####: for binlog
+binlog_format =row
+log_bin =/data/mysql/logs/mysql-bin
+binlog_rows_query_log_events =off
+log_slave_updates =on
+#expire_logs_days =7
+binlog_expire_logs_seconds=604800
+binlog_cache_size =1G
+max_binlog_size =1G
+binlog_checksum =none
+sync_binlog =1
+slave-preserve-commit-order =ON
+log_bin_trust_function_creators=on  
+
+
+
+####:for error-log
+log_error =/data/mysql/logs/mysql.err
+general_log =off
+general_log_file =/data/mysql/logs/general.log
+
+####: for slow query log
+slow_query_log =on
+slow_query_log_file =/data/mysql/logs/slowquery.log
+long_query_time =1.000000
+log_queries_not_using_indexes =0
+
+####: for gtid
+#gtid_executed_compression_period =1000
+gtid_mode =on
+enforce_gtid_consistency =on
+
+####: for replication
+relay-log-index = /data/mysql/logs/relay-bin.index
+relay-log-info-file = /data/mysql/logs/relay-log.info
+relay-log = /data/mysql/logs/relay-bin
+log-slave-updates =1
+skip_slave_start =1
+master_info_repository =table
+relay_log_info_repository =table
+slave_parallel_type =logical_clock
+slave_parallel_workers =2
+
+####: for performance_schema
+performance_schema = 1
+performance_schema_instrument = '%memory%=on'
+performance_schema_instrument = '%lock%=on'
+performance_schema_digests_size =100000
+
+####: for innodb
+innodb_data_file_path =ibdata1:1024M:autoextend
+innodb_temp_data_file_path =ibtmp1:12M:autoextend
+innodb_buffer_pool_filename =ib_buffer_pool # ib_buffer_pool
+innodb_log_files_in_group =3
+innodb_log_file_size =256M # 50331648(48M)
+innodb_max_undo_log_size =256M
+innodb_undo_log_truncate =1
+innodb_undo_tablespaces =2
+innodb_file_per_table =on
+innodb_open_files =65535
+innodb_thread_concurrency =0 # 0
+innodb_read_io_threads =2
+innodb_write_io_threads =2
+innodb_purge_threads =1
+innodb_page_cleaners =1
+innodb_print_all_deadlocks =off
+innodb_lock_wait_timeout =20
+innodb_autoinc_lock_mode =2
+innodb_io_capacity =500
+innodb_io_capacity_max =1000
+
+#########################
+innodb_flush_method =O_DIRECT
+innodb_log_buffer_size =128M
+innodb_flush_log_at_trx_commit =1
+innodb_buffer_pool_size = 128M
+innodb_buffer_pool_instances = 2 
+#innodb_numa_interleave=on
+#####################################
+#######################
+[client]
+socket=/data/mysql/mysql.sock
+————————————————
+
+
+
+
+
+
+
+
+部署中遇到的问题及解决方案
+2.1.启动MYSQL服务时出现无法创建/var/log/error.log
+
+原因：
+容器中启动MySQL 服务的是 mysql 用户。而我们宿主机中是没有mysql 这个用户存在的。没有办法创建error.log
+解决方案：
+所以，MySQL容器启动MySQL 服务是用的mysql 用户。因此，我们可以在启动容器的时候，直接在容器中去运行一个创建error.log 的命令即可。
+
+mkdir /var/log/error.log
+chmod 700 /var/log/error.log
+
+    1
+    2
+
+2.2.Failed to access directory for --secure-file-priv. Please make sure that directory exists and is accessible by MySQL Server. Supplied value : /var/lib/mysql-files
+
+原因：
+启动mysql报如下错误，那是因为MYSQL新特性secure_file_priv对读写文件的影响
+解决方案：
+linux下：修改my.cnf 在[mysqld]内加入secure_file_priv=/var/lib/mysql
+还不行的话就需要指定 /var/lib/mysql-files的外部目录 加上这个：-v /home/mysql/mysql-files:/var/lib/mysql-files/
+2.3.mysql登录报错：ERROR 1045 (28000): Access denied for user ‘root’@‘localhost’ (using password: YES)
+
+在这里插入图片描述
+原因：
+错误1045（28000）：用户’root’@‘localhost’（使用密码：YES）拒绝访问
+
+首先解析此英文：ERROR 1045 (28000): Access denied for user ‘root’@‘localhost’ (using password: YES)；
+解析的地方有两处：1.Access denied（拒绝访问）；2.using password：NO/YES
+一、出现access denied的原因有如下可能：
+1）mysql的服务器停止：
+　　若MySQL已经没有启动，重启MySQL服务器：systemctl restart mysqld
+2）用户的端口号或者IP导致：
+　　若用户的端口号与IP（3306/3307）不一致，打开my.ini文件进行编辑。全部编辑替换为： port=X
+3）mysql的配置文件错误----my.ini等文件：
+　　my.ini文件误输入无效内容，不知道到何处。复制替换该文件；有人已经对my.ini文件进行解释以及注释：https://blog.csdn.net/lienfeng6/article/details/78140404
+4）root用户的密码错误（后面解决）
+
+二、出现 using password的原因如下
+不输入密码：
+错误的密码：
+
+解决方案：
+
+    vim /etc/my.cnf文件；
+    在[mysqld]后添加skip-grant-tables（登录时跳过权限检查）
+    重启docker服务
+
+docker restart mysql8.0
+
+    1
+
+    进入docker容器
+
+docker exec -it mysql8.0 /bin/bash
+
+    1
+
+    修改密码
+
+mysql -uroot -p #此时是没有密码的，直接再按一下enter健即可 
+use mysql
+set password for ‘root’@‘localhost’=password(‘123456a’); #设置root密码为123456a
+flush privileges; #刷新权限
+# 再次设置远程访问和mysql_native_password 加密方式
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';
+alter user 'root'@'%' identified by 'root';
+flush privileges; #刷新权限
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%'WITH GRANT OPTION;
+flush privileges; #刷新权限
+exit;#退出
+
+
+
+    再把my.ini的skip-grant-tables删除或者注释掉，重启docker容器
+
+docker restart mysql8.0
+————————————————
+
+
+
+docker run \
+ --restart=always \
+ --privileged=true \
+ -p 3306:3306 \
+ --name mysql \
+ -e MYSQL_ROOT_PASSWORD=123456a \
+ -d mysql:8 \
+ --default_authentication_plugin=mysql_native_password \
+ --character-set-server=utf8mb4 \
+ --collation-server=utf8mb4_general_ci
