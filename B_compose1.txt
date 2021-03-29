@@ -37,3 +37,53 @@ services:
 
 运行docker-compose
 docker-compos up 启动这个项目的所有服务 必须保证运行命令的目录在docker-compose.yml目录下
+
+----------------------------
+docker-compose命令模板
+命令语法：
+version: "3.0"
+
+services:
+	tomcat: #服务名唯一
+		container_name: ""#相当于run的 --name
+		image：:tomcat:8.0 #创建当前这个服务的镜像使用的那个镜像文件
+		ports:
+			- 8080:8080 #推荐写法 - "8080:8080" 业务 xx:yy这种数字格式为60进制要避免
+				    #多个映射可写为
+					- "x:y"
+					- "i:j"
+					- .....
+		volumes:#数据卷
+			- 宿主机目录：容器内目录
+			- ....多个映射
+			#第二种写法
+			- tomcatwebapps:容器目录 #tomcatwebapps必须要在外部声明
+		networks:#代表当前服务使用哪个网络桥
+			- hello
+		
+	tomcat1: #服务名唯一
+		image：tomcat:8.0 #创建当前这个服务的镜像使用的那个镜像文件
+		ports:
+			- 8081:8080
+
+mysql:
+	image: mysql:8.0
+	container_name: mysql
+		ports:
+			- "3307:3306"
+		volumes:
+			- xxx
+			- ...
+		environment:
+			-MYSQL_ROOT_PASSWORD=root
+		networks:
+			- hello
+redis:
+	......
+networks:
+	hello #声明服务用到的网络桥
+volumes: #卷变量声明
+	tomcatwebapps: #声明自动卷映射名称， 但真实卷名是在名称前加了项目名称即：
+			docker-compose.yml所在文件夹 例如:test_tomcatwebapps真实卷名
+		external:#使用自定义卷名
+			true #确认使用制定卷名
