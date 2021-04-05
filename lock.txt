@@ -1,0 +1,8 @@
+1:synchronized与lock区别
+	1：synchronized是内置关键字，local是一个java类
+	2：synchronized无法获取锁状态，lock可以判断是否获取到了锁
+	3：synchronized自动释放锁，lock手动释放
+	4: synchronized会阻塞，等待锁， lock不一定会等待，会尝试获取锁， trylock()
+	5: synchronized可重入，不可中断，非公平 lock可重入，可判断锁，非公平锁[可自定义]
+	6: synchronized使用少量简单业务逻辑，lock反之
+
